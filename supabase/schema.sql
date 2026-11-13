@@ -13,8 +13,10 @@ create table public.subscriptions(id uuid primary key default gen_random_uuid(),
 create index stores_status_category on public.stores(status,category);
 create index products_store on public.products(store_id,is_active);
 create index orders_store_created on public.orders(store_id,created_at desc);
-alter table public.profiles enable row level security;alter table public.stores enable row level security;alter table public.products enable row level security;alter table public.orders enable row level security;alter table public.order_items enable row level security;alter table public.reviews enable row level security;alter table public.subscriptions enable row level security;
+alter table public.profiles enable row level security;alter table public.categories enable row level security;alter table public.stores enable row level security;alter table public.products enable row level security;alter table public.orders enable row level security;alter table public.order_items enable row level security;alter table public.reviews enable row level security;alter table public.subscriptions enable row level security;
+create policy "public active categories" on public.categories for select using(is_active=true);
 create policy "public active stores" on public.stores for select using(status='active');
+create policy "merchant own store read" on public.stores for select using(owner_id=auth.uid());
 create policy "public active products" on public.products for select using(is_active=true);
 create policy "profile read self" on public.profiles for select using(auth.uid()=id);
 create policy "merchant store update" on public.stores for update using(owner_id=auth.uid()) with check(owner_id=auth.uid());
